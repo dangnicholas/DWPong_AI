@@ -29,16 +29,22 @@ class AISubscriber:
         client.subscribe("camera/gamestate")
 
     def convert_rgb(self, x):
+        """
+        This method was written to convert the game state passed over MQTT from Unity from a single integer
+        to a rgb pixel value which is either white (255, 255, 255) representing a game object
+        or a blue color (140, 60, 0) representing the empty space
+        """
         if int(x) == 0:
             return [140, 60, 0]
         else:
             return [255, 255, 255]
 
     def on_message(self, client, userdata, msg):
+        """
+        This method will listen over MQTT for messages passed on the topics below which is the game state published
+        from the Unity game engine
+        """
         topic = msg.topic
-
-        # if topic == "game/level":
-        #     self.game_level = payload["level"]
 
         # Unity Implementation below
         if topic == "camera/gamestate":
@@ -46,11 +52,14 @@ class AISubscriber:
             self.latest_frame = np.array([self.convert_rgb(x) for x in msg.payload.decode()], dtype=np.float32).reshape(160, 192, 3)
             self.latest_frame = utils.preprocess(self.latest_frame)
 
-
         if topic == "game/frame":
             self.frame = int(msg.payload.decode())
             if Config.instance().NETWORK_TIMESTAMPS:
                 print(f'{time.time_ns() // 1_000_000} F{self.frame} RECV GM->AI')
+
+        # ai_driver will handle different level than it currently has in publish_inference
+        if topic == "game/level":
+            self.game_level = int(msg.payload.decode())
 
 
 

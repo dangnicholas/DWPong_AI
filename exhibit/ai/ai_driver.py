@@ -1,4 +1,5 @@
 import sys
+import os
 from exhibit.ai.model import PGAgent
 from exhibit.shared.config import Config
 #from exhibit.game.game_subscriber import GameSubscriber
@@ -11,7 +12,7 @@ from exhibit.shared.utils import Timer
 
 from queue import Queue
 
-# NICK
+# NICK - for windows
 import os
 
 
@@ -21,11 +22,15 @@ class AIDriver:
     # MODEL_2 = f'./validation/canstop_randomstart_6850.h5'
     # MODEL_3 = f'./validation/canstop_randomstart_10k.h5'
 
+    # Uncomment MODEL_1, MODEL_2, MODEL_3 based on operating system
+
+    # For Linux
     # The locations of the three models used. 1 for each level.
     # MODEL_1 = "./validation/smoothreward_s6_f5_d3_5000.h5"
     # MODEL_2 = "./validation/smoothreward_s6_f5_d3_15000.h5"
     # MODEL_3 = "./validation/smoothreward_s6_f5_d3_22850.h5"
-    # FOR WINDOWS - NICK
+
+    # FOR WINDOWS
     root_dirname = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     MODEL_1 = root_dirname+"\\validation\\smoothreward_s6_f5_d3_5000.h5"
     MODEL_2 = root_dirname+"\\validation\\smoothreward_s6_f5_d3_15000.h5"
@@ -33,9 +38,46 @@ class AIDriver:
     level = 1
 
     def publish_inference(self):
+        """
+        This method will publish some its inference from the game state it has
+        and publish action and frame to paddle1 or paddle2 based on which the AI
+        is to control. Will also check if the level changed and load a new model if needed
+        """
+
+        # Check if the level has changed. If so, we need to load a new model
+        if (AIDriver.level != self.state.game_level):
+            # check if a kill/quit message has been sent via the queue
+            if not self.q.empty():
+                dataQ = self.q.get()
+                if dataQ == "endThreads":
+                    print('ai thread quitting')
+                    while not self.q.empty:  # empty the rest of the q
+                        dataQ = self.q.get()
+                    self.q.put('noneActive')
+                    # a message that goes back to the main program to tell it that the ai_driver has stopped
+                    sys.exit()
+                    print('the sys exit didnt work')
+
+            temp = AIDriver.level
+            AIDriver.level = self.state.game_level
+            print(f'level changed to {AIDriver.level}')
+            if self.state.game_level == 0:
+                self.agent = self.agent1
+                # self.agent1.load(AIDriver.MODEL_1)
+            elif self.state.game_level == 1 and temp != 0:
+                self.agent = self.agent1
+                # self.agent1.load(AIDriver.MODEL_1)
+            elif self.state.game_level == 2:
+                self.agent = self.agent2
+                # self.agent1.load(AIDriver.MODEL_2)
+            elif self.state.game_level == 3:
+                self.agent = self.agent3
+                # self.agent1.load(AIDriver.MODEL_3)
+            else:
+                self.agent = self.agent1
+                # self.agent1.load(AIDriver.MODEL_2)
 
         diff_state = self.state.render_latest_diff()
-        #if type(diff_state) != type(list()):
         # Get latest state diff
 
         current_frame_id = self.state.frame
@@ -49,86 +91,21 @@ class AIDriver:
             if self.paddle1:
                 self.state.publish("paddle1/action", str(action))
                 self.state.publish("paddle1/frame", str(current_frame_id))
-                # self.state.publish("paddle1/action", {"action": str(action)})
-                # self.state.publish("paddle1/frame", {"frame": current_frame_id})
             elif self.paddle2:
                 self.state.publish("paddle2/action", str(action))
                 self.state.publish("paddle2/frame", str(current_frame_id))
-                # self.state.publish("paddle2/action", {"action": str(action)})
-                # self.state.publish("paddle2/frame", {"frame": current_frame_id})
 
             model_activation = self.agent.get_activation_packet()
-            # NICK - TEMPORARY COMMENT OUT
-            #self.state.publish("ai/activation", model_activation)
+            self.state.publish("ai/activation", model_activation)
 
-        # # Timer.start('inf')
-        # # Check if the level has changed. If so, we need to load a new model
-        # if (AIDriver.level != self.state.game_level):
-        #     # check if a kill/quit message has been sent via the queue
-        #     if not self.q.empty():
-        #         dataQ = self.q.get()
-        #         if dataQ == "endThreads":
-        #             print('ai thread quitting')
-        #             while not self.q.empty:  # empty the rest of the q
-        #                 dataQ = self.q.get()
-        #             self.q.put('noneActive')
-        #             # a message that goes back to the main program to tell it that the ai_driver has stopped
-        #             sys.exit()
-        #             print('the sys exit didnt work')
-        #
-        #     temp = AIDriver.level
-        #     AIDriver.level = self.state.game_level
-        #     print(f'level changed to {AIDriver.level}')
-        #     if self.state.game_level == 0:
-        #         self.agent = self.agent1
-        #         # self.agent1.load(AIDriver.MODEL_1)
-        #     elif self.state.game_level == 1 and temp != 0:
-        #         self.agent = self.agent1
-        #         # self.agent1.load(AIDriver.MODEL_1)
-        #     elif self.state.game_level == 2:
-        #         self.agent = self.agent2
-        #         # self.agent1.load(AIDriver.MODEL_2)
-        #     elif self.state.game_level == 3:
-        #         self.agent = self.agent3
-        #         # self.agent1.load(AIDriver.MODEL_3)
-        #     else:
-        #         self.agent = self.agent1
-        #         # self.agent1.load(AIDriver.MODEL_2)
-        #
-        # # Get latest state diff
-        # diff_state = self.state.render_latest_diff()
-        #
-        # current_frame_id = self.state.frame
-        #
-        # # Compute the number of frames that have passed since the last frame
-        # # frame_diff = self.state.frame - self.last_acted_frame
-        # # self.last_acted_frame = self.state.frame
-        # # if frame_diff >= 0:
-        # #    # Throw away negative diffs because we're in a new round
-        # #    self.frame_diffs.append(frame_diff)
-        #
-        # # Infer on flattened state vector
-        # x = diff_state.ravel()
-        # action, _, probs = self.agent.act(x, greedy=True)
-        # # Publish prediction
-        # if self.paddle1:
-        #     self.state.publish("paddle1/action", {"action": str(action)})
-        #     self.state.publish("paddle1/frame", {"frame": current_frame_id})
-        # elif self.paddle2:
-        #     self.state.publish("paddle2/action", {"action": str(action)})
-        #     self.state.publish("paddle2/frame", {"frame": current_frame_id})
-        #
-        # model_activation = self.agent.get_activation_packet()
-        # self.state.publish("ai/activation", model_activation)
-        #
-        # # if len(self.frame_diffs) > 10:
-        # #    print(
-        # #        f"Frame distribution: mean {np.mean(self.frame_diffs)}"
-        # #        f", stdev {np.std(self.frame_diffs)} counts {np.unique(self.frame_diffs, return_counts=True)}")
-        # #    self.frame_diffs = []
-        # # Timer.stop('inf')
+
+
 
     def inference_loop(self):
+        """
+        This method will loop indefinitely to check whether to run inference
+        based on whether the game state it has is updated
+        """
         while True:
             current_frame_id = self.state.frame
             if self.last_acted_frame == current_frame_id:
@@ -139,6 +116,11 @@ class AIDriver:
                 self.last_acted_frame = current_frame_id
 
     def __init__(self, config=Config.instance(), paddle1=True, in_q=Queue()):
+        """
+        This method will construct the ai driver to load in all 3 models from the directories at the
+        top of this page and create threads and an ai_subscriber object to listen over MQTT for game
+        state passed over it
+        """
 
         self.q = in_q
         self.config = config
@@ -164,6 +146,9 @@ class AIDriver:
 
 
 def main(in_q):
+    """
+    This will get the configs used in the config file and also construct the ai_driver using the constructor above
+    """
     # main is separated out so that we can call it and pass in the queue from GUI
     config = Config.instance()
     instance = AIDriver(config=config, in_q=in_q)
