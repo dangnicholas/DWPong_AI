@@ -14,7 +14,7 @@ from queue import Queue
 
 # NICK - for windows
 import os
-
+from PIL import Image
 
 class AIDriver:
     # #MODEL = 'validation/canstop_randomstart_6850.h5'#'../../validation/newhit_10k.h5'
@@ -35,7 +35,7 @@ class AIDriver:
     MODEL_1 = root_dirname+"\\validation\\smoothreward_s6_f5_d3_5000.h5"
     MODEL_2 = root_dirname+"\\validation\\smoothreward_s6_f5_d3_15000.h5"
     MODEL_3 = root_dirname+"\\validation\\smoothreward_s6_f5_d3_22850.h5"
-    level = 1
+    level = 0
 
     def publish_inference(self):
         """
@@ -83,6 +83,11 @@ class AIDriver:
         current_frame_id = self.state.frame
         if isinstance(diff_state, np.ndarray):
             print("DIFF STATE", diff_state.shape)
+
+            if self.last_acted_frame < 500:
+                img = Image.fromarray(diff_state.astype('uint8'), 'L')
+                print(f"PUBLISHED {self.last_acted_frame}.png")
+                img.save(f"C:\\Users\\dangn\\Documents\\images\\{self.last_acted_frame}.png")
 
             # Infer on flattened state vector
             x = diff_state.ravel()
@@ -155,5 +160,5 @@ def main(in_q):
 
 
 if __name__ == "__main__":
-    main("")
+    main(Queue())
 

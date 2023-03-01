@@ -49,8 +49,8 @@ class AISubscriber:
         # Unity Implementation below
         if topic == "camera/gamestate":
             self.trailing_frame = self.latest_frame
-            self.latest_frame = np.array([self.convert_rgb(x) for x in msg.payload.decode()], dtype=np.float32).reshape(160, 192, 3)
-            self.latest_frame = utils.preprocess(self.latest_frame)
+            gamestate = np.array([self.convert_rgb(x) for x in msg.payload.decode()], dtype=np.float32).reshape(160, 192, 3)
+            self.latest_frame = utils.preprocess(np.flipud(gamestate))
 
         if topic == "game/frame":
             self.frame = int(msg.payload.decode())
@@ -89,8 +89,12 @@ class AISubscriber:
         """
         if topic == 'paddle1/frame' and Config.instance().NETWORK_TIMESTAMPS:
             print(f'{time.time_ns() // 1_000_000} F{message["frame"]} SEND AI->GM')
-        #p = json.dumps(message)
-        p = message
+
+        try:
+            p = json.dumps(message)
+        except:
+            p = message
+
         print("publishing... ", topic, message)
         self.client.publish(topic, payload=p, qos=qos)
 
