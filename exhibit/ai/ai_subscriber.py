@@ -95,7 +95,6 @@ class AISubscriber:
         except:
             p = message
 
-        print("publishing... ", topic, message)
         self.client.publish(topic, payload=p, qos=qos)
 
     def render_latest(self, bottom=False):
@@ -137,7 +136,7 @@ class AISubscriber:
         """
         if self.trailing_frame is None:
             return self.latest_frame
-        print("render_latest_diff: (latest, trailing)", self.latest_frame.shape, self.trailing_frame.shape)
+        #print("render_latest_diff: (latest, trailing)", self.latest_frame.shape, self.trailing_frame.shape)
         return self.latest_frame - self.trailing_frame
 
     def ready(self):

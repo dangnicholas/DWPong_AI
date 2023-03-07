@@ -1,0 +1,6 @@
+# PNG images to see AI input
+*.png
+
+# Log files
+*.log
+*.log.*
