@@ -1,9 +1,12 @@
 import http.server
+import os
 import socketserver
 
 if __name__ == "__main__":
     PORT = 8000
-    DIRECTORY = "visualizer"
+    root_dirname = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    DIRECTORY = os.path.join(root_dirname, 'visualizer')
+    print(os.path.abspath(DIRECTORY))
 
 
     class Handler(http.server.SimpleHTTPRequestHandler):

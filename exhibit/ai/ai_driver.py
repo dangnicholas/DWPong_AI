@@ -90,11 +90,11 @@ class AIDriver:
             if self.paddle1:
                 self.state.publish("paddle1/action", str(action))
                 self.state.publish("paddle1/frame", str(current_frame_id))
-                self.logger.info("paddle1 action: " + str(action) + " | frame: " + str(current_frame_id))
+                # self.logger.info("paddle1 action: " + str(action) + " | frame: " + str(current_frame_id))
             elif self.paddle2:
                 self.state.publish("paddle2/action", str(action))
                 self.state.publish("paddle2/frame", str(current_frame_id))
-                self.logger.info("paddle2 action:" + str(action) + " | frame: " + str(current_frame_id))
+                # self.logger.info("paddle2 action:" + str(action) + " | frame: " + str(current_frame_id))
 
             model_activation = self.agent.get_activation_packet()
             self.state.publish("ai/activation", model_activation)

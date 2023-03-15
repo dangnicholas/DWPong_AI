@@ -31,7 +31,7 @@ class Config:
         self.ACTIONS = ["LEFT", "RIGHT", "NONE", "ABSOLUTE"] # available action from real player - ABSOLUTE provides position for paddle rather than a vector
         self.GAME_FPS = 60
         self.AI_FRAME_INTERVAL = 5  # AI will publish inference every n frames
-        self.AI_FRAME_DELAY = 3  # Game will receive each inference n frames late
+        self.AI_FRAME_DELAY = 0  # Game will receive each inference n frames late
         self.BALL_MARKER_SIZE = 4  # Pixel height and width of experimental position markers
         self.CUSTOM = 0
         self.HIT_PRACTICE = 2

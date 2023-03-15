@@ -1,0 +1,29 @@
+* {
+   margin: 0;
+   padding: 0;
+}
+
+body, html {
+   height: 100%;
+   overflow: hidden;
+}
+
+canvas {
+   position:relative;
+}
+
+.visualizer {
+    width: 100%;
+    position:absolute;
+}
+.depth {
+    width: 100%;
+    position:absolute;
+}
+.wrapper {
+   position:relative;
+}
+
+.opponent {
+   height: 100%;
+}
