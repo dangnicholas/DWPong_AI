@@ -122,6 +122,12 @@ class AIDriver:
         state passed over it
         """
         # Set up the logger
+        # Creating log folders if not exists
+        if not os.path.exists(os.path.join(self.root_dirname, 'logs')):
+            os.makedirs(os.path.join(self.root_dirname, 'logs'))
+            os.makedirs(os.path.join(self.root_dirname, 'logs', 'ai_input_images'))
+            with open(os.path.join(self.root_dirname, 'logs', 'ai_driver.log'), 'w'): pass
+
         self.root_dirname = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         logging.basicConfig(
             level=logging.INFO,
