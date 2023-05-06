@@ -1,3 +1,4 @@
+import glob
 import sys
 import os
 from logging.handlers import RotatingFileHandler
@@ -11,11 +12,7 @@ import numpy as np
 import cv2
 import threading
 from exhibit.shared.utils import Timer
-
 from queue import Queue
-
-# NICK - for windows
-import os
 from PIL import Image
 
 import logging
@@ -28,6 +25,7 @@ class AIDriver:
 
     # The locations of the three models used. 1 for each level. Works for Windows and Linux
     root_dirname = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    # 5000, 15000, 22850
     MODEL_1 = os.path.join(root_dirname, 'validation', 'smoothreward_s6_f5_d3_5000.h5')
     MODEL_2 = os.path.join(root_dirname, 'validation', 'smoothreward_s6_f5_d3_15000.h5')
     MODEL_3 = os.path.join(root_dirname, 'validation', 'smoothreward_s6_f5_d3_22850.h5')
@@ -59,22 +57,17 @@ class AIDriver:
             self.logger.info(f'level changed to {AIDriver.level}')
             if self.state.game_level == 0:
                 self.agent = self.agent1
-                # self.agent1.load(AIDriver.MODEL_1)
             elif self.state.game_level == 1 and temp != 0:
                 self.agent = self.agent1
-                # self.agent1.load(AIDriver.MODEL_1)
             elif self.state.game_level == 2:
                 self.agent = self.agent2
-                # self.agent1.load(AIDriver.MODEL_2)
             elif self.state.game_level == 3:
                 self.agent = self.agent3
-                # self.agent1.load(AIDriver.MODEL_3)
             else:
                 self.agent = self.agent1
-                # self.agent1.load(AIDriver.MODEL_2)
 
-        diff_state = self.state.render_latest_diff()
         # Get latest state diff
+        diff_state = self.state.render_latest_diff()
 
         current_frame_id = self.state.frame
         if isinstance(diff_state, np.ndarray):
@@ -84,22 +77,71 @@ class AIDriver:
 
             # Stores the first 500 frames fed into AI model for debugging if needed
             if self.last_acted_frame < 500:
-                img = Image.fromarray(diff_state.astype('uint8'), 'L')
-                img.save(os.path.join(self.root_dirname, 'logs', 'ai_input_images', f"{self.last_acted_frame}_{action}.png"))
+                self.save_gamestate_image(game_state=diff_state, action=action)
+
             # Publish prediction
             if self.paddle1:
-                self.state.publish("paddle1/action", str(action))
-                self.state.publish("paddle1/frame", str(current_frame_id))
-                # self.logger.info("paddle1 action: " + str(action) + " | frame: " + str(current_frame_id))
+                self.state.publish("paddle1/action", {"action": str(action)})
+                self.state.publish("paddle1/frame", {"frame": current_frame_id})
+                self.logger.info("paddle1 action: " + str(action) + " | frame: " + str(current_frame_id))
             elif self.paddle2:
-                self.state.publish("paddle2/action", str(action))
-                self.state.publish("paddle2/frame", str(current_frame_id))
-                # self.logger.info("paddle2 action:" + str(action) + " | frame: " + str(current_frame_id))
+                self.state.publish("paddle2/action", {"action": str(action)})
+                self.state.publish("paddle2/frame", {"frame": current_frame_id})
+                self.logger.info("paddle2 action:" + str(action) + " | frame: " + str(current_frame_id))
 
             model_activation = self.agent.get_activation_packet()
             self.state.publish("ai/activation", model_activation)
 
+    def save_gamestate_image(self, game_state, action):
+        """
+        Will save the game state before it is passed through the AI model as a png file that is 80 x 96
+        pixels. This will allow visual debugging of the AI model to see how a model behaves for different
+        game states and verifying if the game state is being read in correctly.
+        """
+        # try:
+        #     self.logger.info(self.state.latest_frame.shape, self.state.trailing_frame.shape)
+        #     add_state = self.state.render_latest_add()
+        #     add_img = Image.fromarray(add_state.astype('uint8'), 'L')
+        #     add_img.save(os.path.join(self.root_dirname, 'logs', f'ai_input_images',
+        #                               f"add_{self.last_acted_frame}_{action}.png"))
+        # except Exception as e:
+        #     self.logger.error("Failed saving gamestate as image: " + str(e))
 
+        img = Image.fromarray(game_state.astype('uint8'), 'L')
+        img.save(os.path.join(self.root_dirname, 'logs', f'ai_input_images', \
+                              f"diff_{self.last_acted_frame}_{action}.png"))
+
+
+    def setup_logger(self):
+        """
+        This will set up the logging functionality by creating a logs folder which contains
+        the following:
+        - ai_input_images: Folder with the first 500 frames of the game saved as pngs that was passed into the AI model
+        - ai_driver.log: A log file containing all the log outputs for a given run. Keeps up to 10 recent runs
+        """
+        # Set up the logger
+        # Creating log folders if not exists
+        if not os.path.exists(os.path.join(self.root_dirname, 'logs')):
+            os.makedirs(os.path.join(self.root_dirname, 'logs'))
+            os.makedirs(os.path.join(self.root_dirname, 'logs', 'ai_input_images'))
+            with open(os.path.join(self.root_dirname, 'logs', 'ai_driver.log'), 'w'): pass
+
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s %(levelname)s %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        self.handler = RotatingFileHandler(os.path.join(self.root_dirname, "logs", "ai_driver.log"), maxBytes=5000,
+                                           backupCount=10)
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(self.handler)
+
+        self.logger.info(f"Logging set up for ai_driver.log")
+        self.logger.info(
+            "clearing imgs from last session at: " + os.path.join(self.root_dirname, 'logs', 'ai_input_images',
+                                                                  "*.png"))
+        for f in glob.glob(os.path.join(self.root_dirname, 'logs', 'ai_input_images', "*.png")):
+            os.remove(f)
 
 
     def inference_loop(self):
@@ -121,23 +163,11 @@ class AIDriver:
         top of this page and create threads and an ai_subscriber object to listen over MQTT for game
         state passed over it
         """
-        # Set up the logger
-        # Creating log folders if not exists
-        if not os.path.exists(os.path.join(self.root_dirname, 'logs')):
-            os.makedirs(os.path.join(self.root_dirname, 'logs'))
-            os.makedirs(os.path.join(self.root_dirname, 'logs', 'ai_input_images'))
-            with open(os.path.join(self.root_dirname, 'logs', 'ai_driver.log'), 'w'): pass
 
+        # Grabs the current working directory
         self.root_dirname = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s %(levelname)s %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
-        )
-        handler = RotatingFileHandler(os.path.join(self.root_dirname, "logs", "ai_driver.log"), maxBytes=5000, backupCount=10)
-        self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(handler)
-        self.logger.info("Logging set up for ai_driver")
+        # Sets up the logger
+        self.setup_logger()
 
         self.q = in_q
         self.config = config

@@ -41,7 +41,7 @@ class Config:
         self.RANDOMIZE_START = False
         self.BALL_DIAMETER = 8
         self.PADDLE_HEIGHT = 3
-        self.PADDLE_WIDTH = 20
+        self.PADDLE_WIDTH = 15#20
         self.DEPLOYMENT_PADDLE_ADVANTAGE = 0  # Increases paddle width by X at test time
 
         # The 0.5 offsets are a sad artifact of using pixel-centered instead of pixel grid aligned coordinates

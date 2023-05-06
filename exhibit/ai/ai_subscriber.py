@@ -44,22 +44,42 @@ class AISubscriber:
         This method will listen over MQTT for messages passed on the topics below which is the game state published
         from the Unity game engine
         """
+
+
         topic = msg.topic
-
-        # Unity Implementation below
-        if topic == "camera/gamestate":
-            self.trailing_frame = self.latest_frame
-            gamestate = np.array([self.convert_rgb(x) for x in msg.payload.decode()], dtype=np.float32).reshape(160, 192, 3)
-            self.latest_frame = utils.preprocess(np.flipud(gamestate))
-
+        # Xander Implementation below
+        payload = json.loads(msg.payload)
+        #print("PAYLOAD", topic, payload)
+        if topic == "puck/position":
+            self.puck_x = payload["x"]
+            self.puck_y = payload["y"]
+        if topic == "paddle1/position":
+            self.bottom_paddle_x = payload["position"]
+        if topic == "paddle2/position":
+            self.top_paddle_x = payload["position"]
+        if topic == "game/level":
+            self.game_level = payload["level"]
         if topic == "game/frame":
-            self.frame = int(msg.payload.decode())
+            self.frame = payload["frame"]
             if Config.instance().NETWORK_TIMESTAMPS:
                 print(f'{time.time_ns() // 1_000_000} F{self.frame} RECV GM->AI')
+            self.trailing_frame = self.latest_frame
+            self.latest_frame = self.render_latest_preprocessed()
 
-        # ai_driver will handle different level than it currently has in publish_inference
-        if topic == "game/level":
-            self.game_level = int(msg.payload.decode())
+        # Unity Implementation below
+        # if topic == "camera/gamestate":
+        #     self.trailing_frame = self.latest_frame
+        #     gamestate = np.array([self.convert_rgb(x) for x in msg.payload.decode()], dtype=np.float32).reshape(160, 192, 3)
+        #     self.latest_frame = utils.preprocess(np.flipud(gamestate))
+        #
+        # if topic == "game/frame":
+        #     self.frame = int(msg.payload.decode())
+        #     if Config.instance().NETWORK_TIMESTAMPS:
+        #         print(f'{time.time_ns() // 1_000_000} F{self.frame} RECV GM->AI')
+        #
+        # # ai_driver will handle different level than it currently has in publish_inference
+        # if topic == "game/level":
+        #     self.game_level = int(msg.payload.decode())
 
 
 
@@ -136,8 +156,17 @@ class AISubscriber:
         """
         if self.trailing_frame is None:
             return self.latest_frame
-        #print("render_latest_diff: (latest, trailing)", self.latest_frame.shape, self.trailing_frame.shape)
         return self.latest_frame - self.trailing_frame
+
+    def render_latest_add(self):
+        """
+        Render the current game pixel state, subtracted from the previous
+        Guarantees that adjacent frames are used for the add.
+        :return: ndarray of RGB screen pixels
+        """
+        if self.trailing_frame is None:
+            return self.latest_frame
+        return (self.latest_frame + self.trailing_frame)*-1
 
     def ready(self):
         """
@@ -159,7 +188,6 @@ class AISubscriber:
         self.client = mqtt.Client(client_id="ai_module")
         self.client.on_connect = lambda client, userdata, flags, rc : self.on_connect(client, userdata, flags, rc)
         self.client.on_message = lambda client, userdata, msg : self.on_message(client, userdata, msg)
-        print("Initializing subscriber")
         self.client.connect_async("localhost", port=1883, keepalive=60)
         self.puck_x = None
         self.puck_y = None

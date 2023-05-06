@@ -1,46 +1,121 @@
-Logging set up for ai_driver
-Logging set up for ai_driver
-level changed to None
-level changed to 2
-level changed to 1
-Logging set up for ai_driver
-level changed to None
-level changed to 2
-level changed to 3
-level changed to 1
-Logging set up for ai_driver
-level changed to None
-level changed to 2
-Logging set up for ai_driver
-level changed to None
-level changed to 2
-level changed to 3
-level changed to 2
-level changed to 3
-level changed to 2
-level changed to 3
-level changed to 2
-level changed to 3
-Logging set up for ai_driver
-level changed to None
-level changed to 2
-Logging set up for ai_driver
-level changed to None
-level changed to 2
-level changed to 3
-level changed to 2
-level changed to 3
-level changed to 2
-level changed to 3
-level changed to 2
-level changed to 3
-level changed to 2
-level changed to 3
-level changed to 2
-Logging set up for ai_driver
-level changed to None
-level changed to 2
-level changed to 3
-level changed to 2
-Logging set up for ai_driver
-Logging set up for ai_driver
+paddle1 action: 2 | frame: 4144
+paddle1 action: 2 | frame: 4152
+paddle1 action: 2 | frame: 4160
+paddle1 action: 2 | frame: 4168
+paddle1 action: 2 | frame: 4176
+paddle1 action: 2 | frame: 4184
+paddle1 action: 2 | frame: 4192
+paddle1 action: 2 | frame: 4200
+paddle1 action: 2 | frame: 4208
+paddle1 action: 2 | frame: 4216
+paddle1 action: 2 | frame: 4224
+paddle1 action: 2 | frame: 4232
+paddle1 action: 2 | frame: 4240
+paddle1 action: 0 | frame: 4248
+paddle1 action: 1 | frame: 4256
+paddle1 action: 1 | frame: 4264
+paddle1 action: 0 | frame: 4272
+paddle1 action: 0 | frame: 4280
+paddle1 action: 1 | frame: 4288
+paddle1 action: 2 | frame: 4296
+paddle1 action: 2 | frame: 4304
+paddle1 action: 2 | frame: 4312
+paddle1 action: 2 | frame: 4320
+paddle1 action: 2 | frame: 4328
+paddle1 action: 2 | frame: 4336
+paddle1 action: 2 | frame: 4344
+paddle1 action: 2 | frame: 4352
+paddle1 action: 2 | frame: 4360
+paddle1 action: 2 | frame: 4368
+paddle1 action: 2 | frame: 4376
+paddle1 action: 2 | frame: 4384
+paddle1 action: 2 | frame: 4392
+paddle1 action: 2 | frame: 4400
+paddle1 action: 0 | frame: 4408
+paddle1 action: 1 | frame: 4416
+paddle1 action: 0 | frame: 4424
+paddle1 action: 0 | frame: 4432
+paddle1 action: 1 | frame: 4440
+paddle1 action: 2 | frame: 4448
+paddle1 action: 1 | frame: 4456
+paddle1 action: 2 | frame: 4464
+paddle1 action: 2 | frame: 4472
+paddle1 action: 2 | frame: 4480
+paddle1 action: 2 | frame: 4488
+paddle1 action: 2 | frame: 4496
+paddle1 action: 2 | frame: 4504
+paddle1 action: 2 | frame: 4512
+paddle1 action: 2 | frame: 4520
+paddle1 action: 2 | frame: 4528
+paddle1 action: 2 | frame: 4536
+paddle1 action: 2 | frame: 4544
+paddle1 action: 2 | frame: 4552
+paddle1 action: 2 | frame: 4560
+paddle1 action: 2 | frame: 4568
+paddle1 action: 2 | frame: 4576
+paddle1 action: 2 | frame: 4584
+paddle1 action: 2 | frame: 4592
+paddle1 action: 1 | frame: 4600
+paddle1 action: 0 | frame: 4608
+paddle1 action: 2 | frame: 4616
+paddle1 action: 2 | frame: 4624
+paddle1 action: 2 | frame: 4632
+paddle1 action: 0 | frame: 4640
+paddle1 action: 1 | frame: 4648
+paddle1 action: 2 | frame: 4656
+paddle1 action: 2 | frame: 4664
+paddle1 action: 2 | frame: 4672
+paddle1 action: 2 | frame: 4680
+paddle1 action: 2 | frame: 4688
+paddle1 action: 2 | frame: 4696
+paddle1 action: 2 | frame: 4704
+paddle1 action: 2 | frame: 4712
+paddle1 action: 2 | frame: 4720
+paddle1 action: 2 | frame: 4728
+paddle1 action: 2 | frame: 4736
+paddle1 action: 2 | frame: 4744
+paddle1 action: 2 | frame: 4752
+paddle1 action: 2 | frame: 4760
+paddle1 action: 2 | frame: 4768
+paddle1 action: 2 | frame: 4776
+paddle1 action: 1 | frame: 4784
+paddle1 action: 0 | frame: 4792
+paddle1 action: 2 | frame: 4800
+paddle1 action: 1 | frame: 4808
+paddle1 action: 0 | frame: 4816
+paddle1 action: 1 | frame: 4824
+paddle1 action: 0 | frame: 4832
+paddle1 action: 1 | frame: 4840
+paddle1 action: 1 | frame: 4848
+paddle1 action: 0 | frame: 4856
+paddle1 action: 2 | frame: 4864
+paddle1 action: 0 | frame: 4872
+paddle1 action: 1 | frame: 4880
+paddle1 action: 0 | frame: 4888
+paddle1 action: 1 | frame: 4896
+paddle1 action: 0 | frame: 4904
+paddle1 action: 2 | frame: 4912
+paddle1 action: 2 | frame: 4920
+paddle1 action: 0 | frame: 4928
+paddle1 action: 2 | frame: 4936
+paddle1 action: 2 | frame: 4944
+paddle1 action: 1 | frame: 4952
+paddle1 action: 0 | frame: 4960
+paddle1 action: 1 | frame: 4968
+paddle1 action: 1 | frame: 4976
+paddle1 action: 2 | frame: 4984
+paddle1 action: 1 | frame: 4992
+paddle1 action: 0 | frame: 5000
+paddle1 action: 0 | frame: 5008
+paddle1 action: 0 | frame: 5016
+paddle1 action: 2 | frame: 5024
+paddle1 action: 2 | frame: 5032
+paddle1 action: 2 | frame: 5040
+paddle1 action: 2 | frame: 5048
+paddle1 action: 2 | frame: 5056
+paddle1 action: 2 | frame: 5064
+paddle1 action: 2 | frame: 5072
+paddle1 action: 2 | frame: 5080
+paddle1 action: 2 | frame: 5088
+paddle1 action: 2 | frame: 5096
+paddle1 action: 2 | frame: 5104
